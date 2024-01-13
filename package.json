@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "mermaid": "^10.6.1",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5"
   },
