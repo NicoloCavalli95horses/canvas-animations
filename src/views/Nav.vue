@@ -1,10 +1,10 @@
 <template>
-    <h1 class="title">Graphs 📈</h1>
+    <h1 class="title">Canvas 🎨</h1>
     <nav>
-      <RouterLink to="/mindmap">
+      <RouterLink to="/canvas">
         <div class="row">
-          <h2>Mind map</h2>
-          <p>Experiment with Mermaid mind map graph</p>
+          <h2>Canvas experiment</h2>
+          <p>Experiment with 2D canvas and MediaRecorder API</p>
         </div>
       </RouterLink>
     </nav>

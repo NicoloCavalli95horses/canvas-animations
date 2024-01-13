@@ -18,9 +18,9 @@ const router = createRouter({
       component: () => import("../views/Nav.vue"),
     },
     {
-      path: "/mindmap",
-      name: "mindmap",
-      component: () => import("../views/Mindmap.vue"),
+      path: "/canvas",
+      name: "canvas",
+      component: () => import("../views/CanvasDrawing.vue"),
     },
   ],
 });
