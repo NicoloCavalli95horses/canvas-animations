@@ -7,24 +7,15 @@ import { randInt, getRandomRGB } from "./globals.mjs";
 // Classes
 //==================================
 export class Canvas {
-  constructor(width, height, tot_points) {
+  constructor(width, height, points) {
     this.width = width;
     this.height = height;
     this.canvas_element = undefined;
     this.ctx = undefined;
     this.has_bounced = false;
     this.points = [];
-    this.point = {
-      x: null,
-      y: null,
-      radius: null,
-      angle: null,
-      moveX: null,
-      moveY: null,
-      velocity: null,
-      color: null,
-    };
-    this.tot_points = tot_points;
+    this.point = { ...points };
+    this.tot_points = points.tot_points;
   }
 
   /**
@@ -55,18 +46,22 @@ export class Canvas {
    * Initialize the points with required parameters
    */
   initPoints() {
-    for (let i = 1; i <= this.tot_points; i++) {
-      const radius = i * (1.618 / 10);
-      this.points.push({
-        x: this.width / 2,
-        y: this.height - radius - 0.5,
-        radius: radius,
-        angle: randInt(50, 130),
-        velocity: i * 0.02,
-        moveX: undefined,
-        moveY: undefined,
-        color: `rgb(${randInt(0, 255)},${randInt(0, 255)},${randInt(0, 255)})`,
-      });
+    if (typeof this.point?.initPoints === 'function') {
+      this.points = this.point.initPoints();
+    } else {
+      for (let i = 1; i <= this.tot_points; i++) {
+        const radius = i * (1.618 / 10);
+        this.points.push({
+          x: this.width / 2,
+          y: this.height - radius - 0.5,
+          radius: radius,
+          angle: randInt(50, 130),
+          velocity: i * 0.05,
+          moveX: undefined,
+          moveY: undefined,
+          color: `rgb(${randInt(0, 255)},${randInt(0, 255)},${randInt(0, 255)})`,
+        });
+      }
     }
   }
 
@@ -90,26 +85,44 @@ export class Canvas {
   }
 
   drawPoints() {
+    const velocityThreshold = 0.1;
+
     for (let i = 0; i < this.tot_points; i++) {
       const point = this.points[i];
-      const next_point = this.points[i + 1] || undefined;
-      this.calcDirection({point});
-      const has_bounced = this.bounceToBoundaries({point});
+      const next_point = this.points[i + 1] || {};
+
+      // apply gravity
+      // const gravity = this.calculateGravity(point.y, point.gravity);
+      // point.moveY += gravity;
+
+      this.calcDirection( {point} );
+      this.bounceToBoundaries( {point} );
+
       point.x += point.moveX;
       point.y += point.moveY;
-      // point.color = has_bounced ? getRandomRGB() : point.color;
-      this.drawCircle(point);
-      // if (next_point) {
-        // this.drawLine({point, next_point});
-      // }
+
+      if (Math.abs(point.moveX) < velocityThreshold) {
+        point.moveX = 0;
+      }
+      if (Math.abs(point.moveY) < velocityThreshold) {
+        point.moveY = 0;
+      }
+
+      this.drawLine({point, next_point})
+      // this.drawCircle(point);
     }
   }
 
-  calcDirection({point}) {
-    if ( !point.moveX ) {
+  calculateGravity(y, gravity) {
+    const heightAboveX = this.height - y;
+    return Math.min(heightAboveX / this.height) * gravity;
+  }
+
+  calcDirection({ point }) {
+    if (!point.moveX) {
       point.moveX = Math.cos((Math.PI / 180) * point.angle) * point.velocity;
     }
-    if ( !point.moveY ) {
+    if (!point.moveY) {
       point.moveY = Math.sin((Math.PI / 180) * point.angle) * point.velocity;
     }
   }
@@ -123,7 +136,7 @@ export class Canvas {
   }
 
   drawLine({ point, next_point }) {
-    this.ctx.lineWidth = point.radius * 2;
+    this.ctx.lineWidth = point.radius * 1;
     this.ctx.strokeStyle = point.color;
     this.ctx.beginPath();
     this.ctx.moveTo(point.x, point.y);
@@ -134,18 +147,19 @@ export class Canvas {
 
   bounceToBoundaries({ point }) {
     let has_bounced = false;
-  
+
     if (point.x >= this.width - point.radius || point.x <= point.radius) {
-      point.moveX = -point.moveX;
+      point.moveX = -point.moveX * 0.7; // reduce speed every bounce
       has_bounced = true;
     }
-  
+
     if (point.y >= this.height - point.radius || point.y <= point.radius) {
-      point.moveY = -point.moveY;
+      point.moveY = -point.moveY * 0.7;
       has_bounced = true;
     }
-  
+
     this.has_bounced = has_bounced;
     return has_bounced;
   }
+
 }

@@ -4,6 +4,8 @@
 export const SCREEN_SIZE = Object.freeze({
   yt_width: 1920,
   yt_height: 1080,
+  yt_reel_width: 1080,
+  yt_reel_height: 1920,
   instagram_reel_width: 1080,
   instagram_reel_height: 1920,
 });

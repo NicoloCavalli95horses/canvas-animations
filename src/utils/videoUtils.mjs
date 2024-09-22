@@ -1,4 +1,3 @@
-
 //==================================
 // Import
 //==================================
@@ -9,17 +8,28 @@ import { downloadFile } from './globals.mjs';
 //==================================
 export class VideoRecorder {
   #VIDEO_OPTIONS;
-  constructor(canvasRef, fps) {
+  constructor(canvasRef) {
     this.canvasRef = canvasRef;
-    this.fps = fps;
     this.videoStream = undefined;
     this.mediaRecorder = undefined;
     this.frames = [];
-    this.fps = 35;
+    this.fps = 60;
+    this.w_resolution = Math.round(this.canvasRef.width * 1.5);
+    this.h_resolution = Math.round(this.canvasRef.height * 1.5);
+    this.aspect_ratio = this.w_resolution / this.h_resolution;
+
     this.#VIDEO_OPTIONS = {
       mimeType: 'video/webm;codecs=vp9',
-      videoBitsPerSecond: 5000000
-    }
+      videoBitsPerSecond: 10000000,
+      constraints: {
+        width: this.w_resolution,
+        height: this.h_resolution,
+        advanced: [
+          { width: this.w_resolution, height: this.h_resolution },
+          { aspectRatio: this.aspect_ratio }
+        ]
+      }
+    };
   }
 
   initRecord() {
@@ -27,11 +37,7 @@ export class VideoRecorder {
     this.mediaRecorder = new MediaRecorder(this.videoStream, this.#VIDEO_OPTIONS);
     this.mediaRecorder.ondataavailable = (e) => this.frames.push(e.data);
     this.mediaRecorder.onstop = () => this.handleStop();
-    this.videoStream.getVideoTracks()[0].applyConstraints({
-      width: this.canvasRef.width,
-      height: this.canvasRef.height,
-      advanced: [{ alpha: true }]  // Enable alpha channel for transparency
-    });
+    this.videoStream.getVideoTracks()[0].applyConstraints(this.#VIDEO_OPTIONS.constraints);
     this.startRecording();
   }
 
@@ -44,10 +50,7 @@ export class VideoRecorder {
   }
 
   getFrame() {
-    this.videoStream.getVideoTracks()[0].applyConstraints({
-      width: this.canvasRef.width,
-      height: this.canvasRef.height
-    });
+    this.videoStream.getVideoTracks()[0].applyConstraints(this.#VIDEO_OPTIONS.constraints);
     this.videoStream.getVideoTracks()[0].requestFrame();
   }
 
@@ -60,5 +63,7 @@ export class VideoRecorder {
   }
 }
 
-
-
+/* === NOTE ===
+  The aspect ratio of the exported video seems not to be correct: actually this is because the Windows Media Player add a left and right padding.
+  The uploaded video on YouTube respect the given aspect ratio (!)
+ */

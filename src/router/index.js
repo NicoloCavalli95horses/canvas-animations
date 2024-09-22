@@ -18,9 +18,9 @@ const router = createRouter({
       component: () => import("../views/Nav.vue"),
     },
     {
-      path: "/canvas",
-      name: "canvas",
-      component: () => import("../views/CanvasDrawing.vue"),
+      path: "/wowen-knots",
+      name: "wowen-knots",
+      component: () => import("../views/WowenKnots.vue"),
     },
   ],
 });

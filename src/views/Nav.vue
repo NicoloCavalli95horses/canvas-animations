@@ -1,10 +1,10 @@
 <template>
     <h1 class="title">Canvas 🎨</h1>
     <nav>
-      <RouterLink to="/canvas">
+      <RouterLink to="/wowen-knots">
         <div class="row">
-          <h2>Canvas experiment</h2>
-          <p>Experiment with 2D canvas and MediaRecorder API</p>
+          <h2>Wowen knots</h2>
+          <p class="red-text">⚠️ Not uploaded yet</p>
         </div>
       </RouterLink>
     </nav>
@@ -38,7 +38,7 @@
     flex-direction: column;
     h2 {
       letter-spacing: 1px;
-      color: var(--primary);
+      color: #fff;
     }
     .row {
       display: grid;
@@ -53,6 +53,9 @@
       &:hover {
         background-color: var(--primary-02);
         transition-duration: var(--transition-medium);
+      }
+      .red-text {
+        color: orangered;
       }
     }
   }

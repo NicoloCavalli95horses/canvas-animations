@@ -1,5 +1,4 @@
 <template>
-  <div v-if="is_recording" class="toast-msg"><p>Recording 🔴</p></div>
 </template>
 
 <script setup>
@@ -11,13 +10,22 @@ import { SCREEN_SIZE } from "../utils/globals.mjs";
 import { Canvas } from "../utils/canvasUtils.mjs";
 import { VideoRecorder } from "../utils/videoUtils.mjs";
 
+
+//==================================
+// Props
+//==================================
+const props = defineProps({
+  size: Object,
+  points: Object,
+  record: Boolean,
+})
+
+
 //==================================
 // Const
 //==================================
-const WIDTH         = SCREEN_SIZE.instagram_reel_width / 2.5;
-const HEIGHT        = SCREEN_SIZE.instagram_reel_height / 2.5;
-const TOT_POINTS    = 100;
-const CAN_RECORD    = false;
+const WIDTH         = props.size?.width;
+const HEIGHT        = props.size?.height;
 
 let canvas          = undefined;
 let canvas_dom_ref  = undefined;
@@ -57,15 +65,19 @@ function stopRecording() {
 // Life cycle
 //==================================
 onMounted(() => {
-  canvas = new Canvas(WIDTH, HEIGHT, TOT_POINTS);
+  canvas = new Canvas(WIDTH, HEIGHT, props.points);
   canvas_dom_ref = canvas.initCanvas();
   canvas.initPoints();
   initLoop();
-  CAN_RECORD && initRecording();
+  if ( props.record ) {
+    initRecording();
+  }
 });
 
 onUnmounted(() => {
-  CAN_RECORD && stopRecording();
+  if ( props.record ) {
+    stopRecording();
+  }
   window.cancelAnimationFrame(animation_frame);
   canvas.unmount();
 });
